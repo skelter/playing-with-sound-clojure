@@ -21,6 +21,10 @@
                 false ; little endian
                 ))
 
+;; TODO in this fn, the .open is having problems.
+;; according to http://paulsanwald.com/blog/206.html we can try to
+;; help the call by annotating it like this
+;; (.open ^DataLine line audio-format)
 (defn open-line [audio-format]
   (doto (AudioSystem/getLine (DataLine$Info. SourceDataLine audio-format))
     (.open audio-format)
