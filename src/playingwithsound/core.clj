@@ -25,10 +25,13 @@
 ;; according to http://paulsanwald.com/blog/206.html we can try to
 ;; help the call by annotating it like this
 ;; (.open ^DataLine line audio-format)
+;; 11/4/2013 I think I managed it
 (defn open-line [audio-format]
-  (doto (AudioSystem/getLine (DataLine$Info. SourceDataLine audio-format))
-    (.open audio-format)
-    (.start)))
+  (let [^SourceDataLine line (AudioSystem/getLine (DataLine$Info. SourceDataLine audio-format))]
+    ;(println "line: " + (type line) " " line)
+    (doto line
+      (.open  audio-format)
+      (.start))))
 
 (defn sine [sample-rate freq]
   (let [term (/ 1 freq)
@@ -72,7 +75,8 @@
 (defn recalc-data [{:keys [line] :as state} freq]
   (assoc state :data (sine-bytes (.getFormat line) freq)))
 
-(defn play-data [{:keys [line data playing] :as state} agent]
+(defn play-data [{:keys [^SourceDataLine line data playing] :as state} agent]
+ ; (println "line: " + (type line))
   (when (and line data playing)
     (.write line data 0 (count data))
     (send-off agent play-data agent))
@@ -118,3 +122,5 @@
     (Thread/sleep (* base-duration duration)))
   (pause agent))
 
+
+;;(play-melody myagent 2000 100 mountain-king)
